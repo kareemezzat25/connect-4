@@ -1,3 +1,5 @@
+import random
+import math
 num_rows = 6
 num_columns = 7
 player_piece = 1
@@ -91,3 +93,41 @@ def isTerminal(board):
 def minimax(board,depth,alpha,beta,maximizing_player):
     # get the columns that have valid locations
     validlocations = getValidLocations()
+    isTerminal = isTerminal.node(board)
+    if depth == 0 or isTerminal:
+        if isTerminal:
+            if winning(board,2):            # AI is the winner
+                return(None,100000000000000)    
+            elif winning(board,1):          # player is the winner
+                return(None,-100000000000000)
+            else:                           # no one winner
+                return(None,0)
+        else:                               # Depth = 0
+            return(None,position_ofScore(board,2))
+    if maximizing_player:
+        value = -math.inf
+        column = random.choice(validlocations)
+        for col in validlocations:
+            row = getNext_emptyRow(board,col)
+            board_copy = board.copy()
+            new_score = minimax(board_copy,depth-1,alpha,beta,False)[1]
+            if new_score > value:
+                value = new_score
+                column = col
+                alpha = max(alpha,value)
+                if alpha >= beta:
+                    break
+                return column,value
+    else:                                   # minimizing player
+        value = math.inf
+        column = random.choice(validlocations)
+        for col in validlocations:
+            row = getNext_emptyRow(board,col)
+            board_copy = board.copy()
+            new_score = minimax(board_copy,depth-1,alpha,beta,True)[1]
+            if new_score < value:
+                column = col
+                beta = min(beta,value)
+                if alpha >= beta:
+                    break
+                return column,value
